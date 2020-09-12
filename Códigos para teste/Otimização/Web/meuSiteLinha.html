@@ -1,0 +1,136 @@
+<!--
+ CANAL INTERNET E COISAS
+ Cliente MQTT em JavaScript
+ 05/2019 - Andre Michelon
+-->
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Telemetria</title>
+    <style>
+        body {
+            padding-top: 30px;
+            font-family: Verdana, Arial, Helvetica, sans-serif;
+            font-size: 11px;
+            color: black;
+            margin: 5px;
+            background: #a0a0a0 url("http://internetecoisas.com.br/img/Background.jpg") no-repeat fixed center;
+            background-size: cover;
+        }
+
+        th {
+            padding: 5px;
+            border-radius: 12px;
+            color: #ffffff;
+            background: #404040;
+            border: #000000 solid 3px;
+        }
+
+        td {
+            text-align: center;
+            padding: 5px;
+            border-radius: 10px;
+            background: #666666;
+            border: #000000 solid 3px;
+        }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/paho-mqtt/1.0.1/mqttws31.min.js"></script>
+    <script src="https://www.gstatic.com/charts/loader.js"></script>
+    <script>
+
+        /***************************************************
+         * Cliente MQTT
+         */
+
+        // Variáveis para cliente MQTT
+        var mqtt;
+        var reconnectTimeout = 2000;
+        var host = "127.0.0.1";
+        var port = 9001;
+
+        var array = [["Tempo", "Velocidade"]]; 
+
+        function onConnect() {
+            // Conexao ao Broker
+            console.log("Conectado");
+            mqtt.subscribe("test");
+        }
+        function onError(message) {
+            // Ocorrencia de erro
+            console.log("Falha: " + message.errorCode + " " + message.errorMessage);
+            setTimeout(MQTTConnect, reconnectTimeout);
+        }
+        function onMessageArrived(msg) {
+            // Mensagem recebida
+            console.log("Mensagem: " + msg.destinationName + "=" + msg.payloadString);
+
+            if (msg.destinationName == "test") { //Se receber mensagem do topico "test", entra aqui
+                // Test
+
+                var data = new Date();
+                var hora    = data.getHours();          // 0-23
+                var min     = data.getMinutes();        // 0-59
+                var seg     = data.getSeconds();        // 0-59
+                var mseg    = data.getMilliseconds();   // 0-999
+                
+                array.push([hora + ':' + min + ':' + seg + "." + mseg, parseInt(msg.payloadString)]);
+                // o .push conctena o tempo atual e a mensagem recebida na matriz(vetor de vetor) array
+
+                var dataTest = google.visualization.arrayToDataTable(array); //Pega o ponto do grafico
+
+                chartTest.draw(dataTest, optionsTest); // Desenha o ponto junto com as opções
+            }
+        }
+        function MQTTConnect() {
+            // Conecta no Broker
+            console.log("Conectando " + host + " " + port);
+            mqtt = new Paho.MQTT.Client(host, port, "IeCJSClient" + parseInt(Math.random() * 1e5));
+            var options = {
+                timeout: 10,
+                keepAliveInterval: 10,
+                onSuccess: onConnect,
+                onFailure: onError
+            };
+            mqtt.onMessageArrived = onMessageArrived;
+            mqtt.onConnectionLost = onError;
+            mqtt.connect(options);
+        }
+
+        /***************************************************
+         * Gráficos
+         */
+
+        // Instancias dos gráficos
+        //google.charts.load('current', { 'packages': ['gauge'], 'language': 'pt-br', 'mapsApiKey': 'AIzaSyBWF8UvD9TyJSKsSCKP3PtHisRPbG4zuRA' });
+        google.charts.load('current', {'packages':['corechart']});
+        google.charts.setOnLoadCallback(drawTest);
+
+        // Variáveis para gráficos
+        var chartTest;
+        var dataTest;
+        var optionsTest;
+
+        function drawTest() {
+            // Desenha Test
+            dataTest = google.visualization.arrayToDataTable([
+                ['Tempo', 'Velocidade'],
+                ['0', 0]
+            ]);
+            optionsTest = {
+                title: 'Velocidade',
+                curveType: 'function',
+                legend: { position: 'bottom' },
+            };
+            chartTest = new google.visualization.LineChart(document.getElementById('curve_chart'));
+            chartTest.draw(dataTest, optionsTest);
+        }
+    </script>
+</head>
+
+<body onload="MQTTConnect()">
+    <body>
+        <div id="curve_chart" style="width: 900px; height: 500px"></div>
+      </body>
+</html>

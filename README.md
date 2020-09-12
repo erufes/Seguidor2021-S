@@ -8,3 +8,5 @@ Link do projeto anterior: https://github.com/Harmonia2Side/Seguidor_IronCup
 ## Outros links
 
 Site da ERUS: http://www.erus.ufes.br/
+Estado dos códigos do esp: https://docs.google.com/spreadsheets/d/1NsqyXf5tRVbZYgRMkoCLKa4che99wPziOAWq4is1gYk
+Estado dos códigos de otimização: https://docs.google.com/spreadsheets/d/1WNFsbv5WY6tbLKcxQk12caa-Jsai9kgLHkolLV0Lp_0
