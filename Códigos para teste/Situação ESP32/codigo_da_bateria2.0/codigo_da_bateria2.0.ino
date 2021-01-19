@@ -6,6 +6,9 @@ float V;                                                                  // Ten
 float aRef = 3;                                                           // Tensão máxima que pode ser lida numa porta analógica (3 ou 5)
 float relacao = (143 / 43);
 
+float verificaBateria();
+float lePorta(uint8_t portaAnalogica);
+
 ////////////// setup() da Bateria //////////////
 
 void setup() {
@@ -24,11 +27,11 @@ float lePorta(uint8_t portaAnalogica) {
 }
 
 
-int verificaBateria() {
-  V = (lePorta(EntradaTensao) * aRef) / 1024.0);
+float verificaBateria() {
+  V = (lePorta(EntradaTensao) * aRef) / 1023.0);
   V *= relacao;
   if (V <= 8.2 || V >= 8.4) {
-  return -1;
-}
-else return 1;
+    return -1;
+  }
+  else return V;
 }
