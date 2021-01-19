@@ -8,11 +8,19 @@ float relacao = (143 / 43);
 
 ////////////// setup() da Bateria //////////////
 
+float lePorta(uint8_t portaAnalogica);
+int verificaBateria();
+
 void setup() {
   pinMode(EntradaTensao, INPUT);
 }
 
 ////////////// Main e Funçoes auxiliares da Bateria //////////////
+
+void loop(){
+
+  
+}
 
 float lePorta(uint8_t portaAnalogica) {
   float total = 0;
@@ -25,10 +33,10 @@ float lePorta(uint8_t portaAnalogica) {
 
 
 int verificaBateria() {
-  V = (lePorta(EntradaTensao) * aRef) / 1024.0);
+  V = (lePorta(EntradaTensao) * aRef) / 1023.0);
   V *= relacao;
   if (V <= 8.2 || V >= 8.4) {
   return -1;
 }
-else return 1;
+else return V;
 }
